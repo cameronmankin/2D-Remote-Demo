@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
@@ -15,6 +16,7 @@ public class Player : MonoBehaviour
     public float RunSpeed;
     public float JumpSpeed;
     public LayerMask GroundMask;
+    public Player PlayerPrefab;
 
     private Rigidbody2D _rigidbody;
     private BoxCollider2D _boxCollider;
@@ -40,9 +42,16 @@ public class Player : MonoBehaviour
         if (Input.GetButtonDown("Jump") && IsGrounded())
         {
             _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, JumpSpeed);
+
+            Player instance = Instantiate(PlayerPrefab);
         }
 
         UpdateAnimation(horizontalInputs);
+
+        if(transform.position.y < -10)
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -52,6 +61,14 @@ public class Player : MonoBehaviour
         if (potentialFruit != null)
         {
             Destroy(potentialFruit.gameObject);
+        }
+
+        Exit potentialExit = collision.gameObject.GetComponent<Exit>();
+
+        if (potentialExit != null)
+        {
+            int toLoad = SceneManager.GetActiveScene().buildIndex + 1;
+            SceneManager.LoadScene(toLoad);
         }
     }
 
